@@ -5,13 +5,13 @@ const SearchResults = ({ result }) => {
     const { title, body } = result
 
     return (
-      <div>
+      <div className="text-center mt-4">
         <h1>{title}</h1>
         <p>{body}</p>
       </div>
     )
   } else if (result === undefined) {
-    return <div className="text-primary">No record found for this URL in our system</div>
+    return <h3 className="text-center mt-4">No record found for this URL in our system</h3>
   }
 
   return null
