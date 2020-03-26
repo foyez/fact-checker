@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import SearchBox from '../../components/SearchBox/SearchBox'
 import SearchResult from '../../components/SearchResult/SearchResult'
-import { firestore, getUrlArticles } from '../../firebase/firebase.utils'
+import { firestore } from '../../firebase/firebase.utils'
 
 const HomePage = () => {
   const [url, setUrl] = useState('')
@@ -19,16 +19,16 @@ const HomePage = () => {
 
     if (url.length <= 3) return
 
-    const fetchArticles = async () => {
-      try {
-        const urlsRef = await firestore.collection('urls')
-        const snapshot = await urlsRef.get()
-        // console.log(getUrlArticles(snapshot, url))
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchArticles()
+    // const fetchArticles = async () => {
+    //   try {
+    //     const urlsRef = await firestore.collection('urls')
+    //     const snapshot = await urlsRef.get()
+    //     // console.log(getUrlArticles(snapshot, url))
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // }
+    // fetchArticles()
 
     const fetchArticle = async () => {
       try {
