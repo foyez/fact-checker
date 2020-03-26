@@ -8,6 +8,7 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const unsubscribeFromAuth = auth.onAuthStateChanged(user => {
       setCurrentUser(user)
+      // console.log(user)
     })
 
     return () => {

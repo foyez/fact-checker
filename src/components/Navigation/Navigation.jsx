@@ -18,9 +18,12 @@ const Navigation = ({ currentUser }) => {
           Sign in with facebook
         </button>
       ) : (
-        <button className="btn btn-danger" onClick={() => auth.signOut()}>
-          Logout
-        </button>
+        <>
+          <strong className="mr-md-2">{currentUser.displayName}</strong>
+          <button className="btn btn-danger" onClick={() => auth.signOut()}>
+            Logout
+          </button>
+        </>
       )}
     </div>
   )

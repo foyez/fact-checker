@@ -34,6 +34,7 @@ const HomePage = () => {
       try {
         let transformedUrl = url.replace(/^http(s)?:\/\//i, '')
         transformedUrl = transformedUrl.replace(/^www\./i, '')
+        transformedUrl = transformedUrl.replace(/\/$/, '')
         transformedUrl = transformedUrl.replace(/\//g, '\\')
 
         const urlsRef = await firestore.doc(`urls/${transformedUrl}`)
