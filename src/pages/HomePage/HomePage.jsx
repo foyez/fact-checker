@@ -36,14 +36,16 @@ const HomePage = () => {
         transformedUrl = transformedUrl.replace(/^www\./i, '')
         transformedUrl = transformedUrl.replace(/\/$/, '')
 
-        const snapshot = await firestore
-          .collection('urls')
-          .where('url', '==', transformedUrl)
-          .get()
+        const urlRef = firestore.collection('urls').where('url', '==', transformedUrl)
 
-        const article = snapshot.docs[0].data()
+        const snapshot = await urlRef.get()
 
-        setArticle({ id: snapshot.docs[0].id, ...article })
+        if (snapshot.empty === false) {
+          const article = snapshot.docs[0].data()
+          setArticle({ id: snapshot.docs[0].id, ...article })
+        } else {
+          setArticle(undefined)
+        }
       } catch (error) {
         console.log(error)
       }

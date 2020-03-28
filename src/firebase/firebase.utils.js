@@ -31,7 +31,7 @@ export const likeArticle = async (articleId, currentUser) => {
   //   this.favorites.push(id);
   // }
   try {
-    if (currentUser.likes.indexOf(articleId) === -1) {
+    if (currentUser && currentUser.likes.indexOf(articleId) === -1) {
       await firestore
         .collection('users')
         .doc(currentUser.id)
