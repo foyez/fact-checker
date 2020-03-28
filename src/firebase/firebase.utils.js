@@ -38,8 +38,66 @@ export const getUrlArticles = urls => {
   })
 }
 
-export const getUrlArticle = url => {
-  return url
+export const createUserProfileDocument = async user => {
+  if (!user) return
+
+  const userRef = firestore.doc(`users/${user.uid}`)
+  const snapshot = await userRef.get()
+
+  if (!snapshot.exists) {
+    const { displayName, email, photoURL } = user
+    const createdAt = new Date()
+
+    try {
+      await userRef.set({
+        displayName,
+        email,
+        photoURL,
+        createdAt,
+      })
+    } catch (error) {
+      console.log('error creating user', error)
+    }
+  }
+
+  return userRef
+}
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged(userAuth => {
+      unsubscribe()
+      resolve(userAuth)
+    }, reject)
+  })
+}
+
+export const getComments = comments => {
+  const mapComment = comment => {
+    const { authorId, body, createdAt } = comment.data()
+
+    return {
+      id: comment.id,
+      authorId,
+      body,
+      createdAt,
+    }
+  }
+
+  return comments.docs.map(mapComment)
+}
+
+export const createComment = async comment => {
+  const addedCommentRef = await firestore.collection('comments').add({
+    ...comment,
+    createdAt: new Date(),
+  })
+  const snapshot = await addedCommentRef.get()
+
+  return {
+    id: addedCommentRef.id,
+    ...snapshot.data(),
+  }
 }
 
 export const firestore = firebase.firestore()

@@ -6,7 +6,7 @@ import { firestore } from '../../firebase/firebase.utils'
 
 const HomePage = () => {
   const [url, setUrl] = useState('')
-  const [result, setResult] = useState(null)
+  const [article, setArticle] = useState(null)
 
   const handleChange = e => {
     let { value } = e.target
@@ -35,13 +35,15 @@ const HomePage = () => {
         let transformedUrl = url.replace(/^http(s)?:\/\//i, '')
         transformedUrl = transformedUrl.replace(/^www\./i, '')
         transformedUrl = transformedUrl.replace(/\/$/, '')
-        transformedUrl = transformedUrl.replace(/\//g, '\\')
 
-        const urlsRef = await firestore.doc(`urls/${transformedUrl}`)
-        const snapshot = await urlsRef.get()
-        const article = await snapshot.data()
+        const snapshot = await firestore
+          .collection('urls')
+          .where('url', '==', transformedUrl)
+          .get()
 
-        setResult(article)
+        const article = snapshot.docs[0].data()
+
+        setArticle({ id: snapshot.docs[0].id, ...article })
       } catch (error) {
         console.log(error)
       }
@@ -52,7 +54,7 @@ const HomePage = () => {
   return (
     <div>
       <SearchBox changed={handleChange} submitted={handleSubmit} value={url} />
-      <SearchResult result={result} />
+      <SearchResult article={article} />
     </div>
   )
 }

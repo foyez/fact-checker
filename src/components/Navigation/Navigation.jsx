@@ -5,6 +5,7 @@ import { auth, facebookProvider } from '../../firebase/firebase.utils'
 import './Navigation.scss'
 
 const Navigation = ({ currentUser }) => {
+  // console.log(currentUser)
   const signInWithFacebook = async () => {
     const user = await auth.signInWithPopup(facebookProvider)
     currentUser = user
