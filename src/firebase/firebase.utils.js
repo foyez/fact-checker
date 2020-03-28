@@ -26,6 +26,56 @@ const config = {
 
 firebase.initializeApp(config)
 
+export const likeArticle = async (articleId, currentUser) => {
+  // if (this.favorites.indexOf(id) === -1) {
+  //   this.favorites.push(id);
+  // }
+  try {
+    if (currentUser.likes.indexOf(articleId) === -1) {
+      await firestore
+        .collection('users')
+        .doc(currentUser.id)
+        .update({
+          likes: firebase.firestore.FieldValue.arrayUnion(articleId),
+        })
+
+      await firestore
+        .collection('urls')
+        .doc(articleId)
+        .update({
+          likesCount: firebase.firestore.FieldValue.increment(1),
+        })
+
+      const snapshot = await firestore
+        .collection('urls')
+        .doc(articleId)
+        .get()
+
+      return snapshot.data()
+
+      // return {
+      //   id: addedCommentRef.id,
+      //   ...snapshot.data(),
+      // }
+    }
+
+    // console.log(articleId, currentUser)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getUrlArticleById = async articleId => {
+  const snapshot = await firestore
+    .doc('urls/' + articleId)
+    // .where('url', '==', transformedUrl)
+    .get()
+
+  const article = snapshot.data()
+
+  return article
+}
+
 export const getUrlArticles = urls => {
   return urls.docs.map(url => {
     const { title, body } = url.data()
@@ -53,6 +103,8 @@ export const createUserProfileDocument = async user => {
         displayName,
         email,
         photoURL,
+        likes: [],
+        dislikes: [],
         createdAt,
       })
     } catch (error) {
@@ -72,8 +124,26 @@ export const getCurrentUser = () => {
   })
 }
 
-export const getComments = comments => {
-  const mapComment = comment => {
+export const getComments = async articleId => {
+  const commentsSnapshot = await firestore
+    .collection('comments')
+    .where('articleId', '==', articleId)
+    .orderBy('createdAt', 'desc')
+    // .limit(2)
+    .get()
+
+  // const mapComment = comment => {
+  //   const { authorId, body, createdAt } = comment.data()
+
+  //   return {
+  //     id: comment.id,
+  //     authorId,
+  //     body,
+  //     createdAt,
+  //   }
+  // }
+
+  return commentsSnapshot.docs.map(comment => {
     const { authorId, body, createdAt } = comment.data()
 
     return {
@@ -82,9 +152,7 @@ export const getComments = comments => {
       body,
       createdAt,
     }
-  }
-
-  return comments.docs.map(mapComment)
+  })
 }
 
 export const createComment = async comment => {

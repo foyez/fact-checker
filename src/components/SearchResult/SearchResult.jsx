@@ -5,14 +5,20 @@ import './SearchResult.scss'
 
 const SearchResults = ({ article }) => {
   if (article) {
-    const { id, title, body } = article
+    const { id, title, body, likesCount } = article
 
     return (
       <div className="mx-auto mt-4 w-50 text-center search-result">
-        <Link to={`/article/${id}`}>
-          <h1>{title}</h1>
-          <p>{body}</p>
-        </Link>
+        <div>
+          <Link to={`/article/${id}`}>
+            <h1>{title}</h1>
+            <p>{body}</p>
+          </Link>
+        </div>
+
+        <div>
+          <strong>Like {likesCount}</strong>
+        </div>
       </div>
     )
   } else if (article === undefined) {

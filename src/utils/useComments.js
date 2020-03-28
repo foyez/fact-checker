@@ -1,24 +1,32 @@
 import { useState, useEffect } from 'react'
-import { firestore, getComments } from '../firebase/firebase.utils'
+import { getComments, getUrlArticleById } from '../firebase/firebase.utils'
 
-export const useComments = articleId => {
-  const [comments, setComments] = useState([])
+export const useArticle = articleId => {
+  const [article, setArticle] = useState({
+    articleContent: '',
+    comments: [],
+  })
 
   useEffect(() => {
-    const fetchComments = async () => {
-      const snapshot = await firestore
-        .collection('comments')
-        .where('articleId', '==', articleId)
-        .orderBy('createdAt', 'desc')
-        // .limit(2)
-        .get()
+    const fetchArticle = async () => {
+      // const snapshot = await firestore
+      //   .collection('comments')
+      //   .where('articleId', '==', articleId)
+      //   .orderBy('createdAt', 'desc')
+      //   // .limit(2)
+      //   .get()
+      const [articleContent, comments] = await Promise.all([
+        getUrlArticleById(articleId),
+        getComments(articleId),
+      ])
+      // console.log(articleContent)
 
-      const fetchedComments = await getComments(snapshot)
-      setComments(fetchedComments)
+      // const fetchedComments = await getComments(articleId)
+      setArticle({ ...article, articleContent, comments })
     }
 
-    fetchComments()
+    fetchArticle()
   }, [articleId])
 
-  return comments
+  return article
 }

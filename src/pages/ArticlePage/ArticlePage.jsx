@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Comments from '../../components/Comments/Comments'
-import { useComments } from '../../utils/useComments'
-import { auth, createUserProfileDocument, createComment } from '../../firebase/firebase.utils'
+import { useArticle } from '../../utils/useComments'
+import {
+  auth,
+  createUserProfileDocument,
+  createComment,
+  likeArticle,
+} from '../../firebase/firebase.utils'
 
 const ArticlePage = ({ match }) => {
   const [currentUser, setCurrentUser] = useState(null)
@@ -10,8 +15,11 @@ const ArticlePage = ({ match }) => {
     articleId: '',
     authorId: '',
   })
+  const [likes, setLikes] = useState(0)
+  const { articleContent, comments } = useArticle(match.params.id)
 
   useEffect(() => {
+    setLikes(articleContent.likesCount)
     const unsubscribeFromAuth = auth.onAuthStateChanged(async user => {
       // setCurrentUser(user)
       // console.log(user)
@@ -32,9 +40,20 @@ const ArticlePage = ({ match }) => {
     return () => {
       unsubscribeFromAuth()
     }
-  }, [])
+  }, [articleContent.likesCount])
 
-  const fetchedComments = useComments(match.params.id)
+  const handleLikeClick = () => {
+    likeArticle(match.params.id, currentUser).then(article => {
+      if (article) {
+        setLikes(article.likesCount)
+      }
+      // console.log(likes)
+    })
+  }
+
+  // useEffect(() => {
+  //   setNewLikes(likes)
+  // }, [likes])
 
   const handleChange = e => {
     const { value } = e.target
@@ -50,16 +69,22 @@ const ArticlePage = ({ match }) => {
       authorId: currentUser.id,
       articleId: match.params.id,
     }).then(comment => {
-      console.log(comment)
+      // console.log(comment)
       setComment(comment)
     })
     // e.target.comment = ''
     // setComment()
   }
 
-  return (
+  return !articleContent || !comments ? (
+    <div>Loading...</div>
+  ) : (
     <div>
-      <div>Article Page: {match.params.id}</div>
+      <div>
+        <h3>{articleContent.title}</h3>
+        <p>{articleContent.body}</p>
+        <button onClick={handleLikeClick}>Likes {likes}</button>
+      </div>
       <hr />
       {currentUser && (
         <form className="d-flex mb-5" onSubmit={handleCommentSubmit}>
@@ -72,7 +97,7 @@ const ArticlePage = ({ match }) => {
           <button className="btn btn-primary">comment</button>
         </form>
       )}
-      <Comments comment={comment} comments={fetchedComments} />
+      <Comments comment={comment} comments={comments} />
     </div>
   )
 }
